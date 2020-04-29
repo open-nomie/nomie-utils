@@ -1,0 +1,45 @@
+{
+  "name": "nomie-utils",
+  "version": "0.0.1",
+  "description": "Nomie5 utilities",
+  "main": "build/index.js",
+  "module": "build/index.es.js",
+  "jsnext:main": "build/index.es.js",
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "standard src/*",
+    "test-watch": "jest --coverage --watchAll",
+    "test": "jest --coverage",
+    "release": "npm run lint && npm run test && release-it"
+  },
+  "files": [
+    "build"
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "standard": {
+    "ignore": [
+      "node_modules/",
+      "build/"
+    ]
+  },
+  "author": "Brandon Corbin",
+  "license": "MIT",
+  "devDependencies": {
+    "release-it": "^13.5.7",
+    "rollup": "^2.7.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.2",
+    "rollup-plugin-typescript2": "^0.27.0",
+    "standard": "^14.3.3",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/jest": "^25.2.1",
+    "jest": "^25.5.1",
+    "ts-jest": "^25.4.0"
+  }
+}
