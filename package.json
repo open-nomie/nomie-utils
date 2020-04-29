@@ -1,6 +1,6 @@
 {
   "name": "nomie-utils",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Nomie 5 utilities",
   "main": "build/index.js",
   "module": "build/index.es.js",
