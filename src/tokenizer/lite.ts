@@ -1,24 +1,5 @@
 import time from '../time/time'
-
-export interface WordPart {
-  word: string
-  remainder: string
-}
-export interface Token {
-  id: string
-  raw: string // Raw word
-  prefix: string // #,@,+
-  type: string // type of trackableElement
-  value: string | number // value of the tracker
-  remainder: string //any trailing words
-}
-
-export interface DeepResults {
-  trackers: Array<any>
-  context: Array<any>
-  people: Array<any>
-  tokens: Array<Token>
-}
+import { Token, WordPart } from './_interfaces'
 
 /**
  * getValueString
@@ -99,7 +80,7 @@ function toToken(
  * elements
  * @param {String} str
  */
-function parse(str: string): Array<Token> {
+function parse(str: string = ''): Array<Token> {
   // Split it into an array of lines
   let lines = str.split(/\r?\n/)
   let final: Array<Token> = []
@@ -117,36 +98,6 @@ function parse(str: string): Array<Token> {
   })
   // Return parsed note
   return final
-}
-
-/**
- * Sum all numbers in an array
- * @param nums Array
- */
-function sum(nums: Array<number>): number {
-  return nums.reduce(function (a, b) {
-    return a + b
-  }, 0)
-}
-/**
- * Average all numbers in an array
- * @param nums Array
- */
-function average(nums: Array<number>): number {
-  const total = nums.reduce((acc, c) => acc + c, 0)
-  return total / nums.length
-}
-
-/**
- * Deep Tokenization
- * Parse, and calculate base stats
- * @param nums Array
- */
-function deep(str: string): DeepResults {
-  let tokens: Array<Token> = parse(str)
-  let response = stats(tokens)
-  response.tokens = tokens
-  return response
 }
 
 /**
@@ -213,62 +164,4 @@ function parseStr(str: string): any {
   )
 } // end parse string
 
-/**
- * Stats
- * Generate stats for a set of tokens
- * @param tokens Array
- */
-function stats(tokens: Array<Token>): DeepResults {
-  let map: any = {
-    trackers: {},
-    people: {},
-    context: {}
-  }
-  // Loop over tokens
-  tokens.forEach((token: Token) => {
-    // If its a tracker - do tracker things
-    if (token.type == 'tracker') {
-      map.trackers[token.id] =
-        map.trackers[token.id] || Object.assign(token, {})
-      map.trackers[token.id].values = map.trackers[token.id].values || []
-      map.trackers[token.id].values.push(token.value)
-    } else {
-      // Map person to people if needed
-      let type = token.type == 'person' ? 'people' : token.type
-      // Setup map for type
-      map[type] = map[type] || {}
-      map[type][token.id] = map[type][token.id] || Object.assign(token, {})
-      map[type][token.id].values = map[type][token.id].values || []
-      map[type][token.id].values.push(1)
-    }
-  })
-
-  // Create a Map for Results
-  let results: any = {
-    trackers: [],
-    context: [],
-    people: []
-  }
-
-  // Loop over the map to do final filtering
-  Object.keys(map).forEach((type) => {
-    let items = map[type]
-    // Loop over items for this type
-    results[type] = Object.keys(items).map((id) => {
-      let token = items[id]
-      token.sum = sum(token.values)
-      token.avg = average(token.values)
-      return token
-    })
-  })
-
-  let response = results
-  response.words = tokens.length
-
-  return response
-}
-
-export const tokenizeDeep = deep
-export const tokenize = function (str: string = ''): Array<Token> {
-  return parse(str)
-}
+export default parse

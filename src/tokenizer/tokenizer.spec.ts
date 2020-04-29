@@ -1,4 +1,7 @@
-import { tokenize, tokenizeDeep } from './tokenize-note'
+// import { tokenize, tokenizeDeep } from './tokenize-note'
+
+import tokenize from './lite'
+import tokenizeDeep from './deep'
 
 let note = `Testing #notes #notes(10.1) 
     #sleep(04:00:00) #sleep(00:10:00) #note #notes_boat 
@@ -12,6 +15,16 @@ test('should parse a note', () => {
   expect(tokens.filter((t) => t.type == 'tracker').length).toBe(6)
   expect(tokens.filter((t) => t.type == 'person').length).toBe(4)
   expect(tokens.filter((t) => t.type == 'link').length).toBe(2)
+})
+
+test('should handle handle links', () => {
+  let linkNote = `This is a note with linkes! 
+    https://github.com and https://nomie.app what about http://twitter.com/brandoncorbin and thats it
+  `
+  let results = tokenizeDeep(linkNote)
+  expect(results.links.length).toBe(3)
+  expect(results.links[0].raw).toBe('https://github.com')
+  expect(results.links[2].raw).toBe('http://twitter.com/brandoncorbin')
 })
 
 test('should handle nothing gracefully', () => {
@@ -37,6 +50,18 @@ test('should tokenize deep a note', () => {
   expect(results.context.length).toBe(2)
   expect(results.people.length).toBe(3)
   expect(results.trackers.length).toBe(4)
+  expect(results.get('tracker', 'sleep').sum).toBe(15000)
+
+  expect(tokenizeDeep('#walked(1.6mile)').get('tracker', 'walked').sum).toBe(
+    1.6
+  )
+  expect(tokenizeDeep('#💩(1.6mile)').get('tracker', '💩').sum).toBe(1.6)
+  expect(tokenizeDeep('+💩').get('context', '💩')).toBeTruthy()
+  expect(tokenizeDeep('@💩').get('person', '💩')).toBeTruthy()
+
+  // Does not exist
+  expect(results.get('tracker', 'turkey')).toBeFalsy()
+  expect(results.get('turkey', 'turkey')).toBeFalsy()
 })
 
 test('stats should sum and average multiple of the same tag', () => {
