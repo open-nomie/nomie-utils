@@ -144,10 +144,9 @@ function average(nums: Array<number>): number {
  */
 function deep(str: string): DeepResults {
   let tokens: Array<Token> = parse(str)
-  return {
-    ...stats(tokens),
-    ...{ tokens }
-  }
+  let response = stats(tokens)
+  response.tokens = tokens
+  return response
 }
 
 /**
@@ -229,7 +228,8 @@ function stats(tokens: Array<Token>): DeepResults {
   tokens.forEach((token: Token) => {
     // If its a tracker - do tracker things
     if (token.type == 'tracker') {
-      map.trackers[token.id] = map.trackers[token.id] || { ...token }
+      map.trackers[token.id] =
+        map.trackers[token.id] || Object.assign(token, {})
       map.trackers[token.id].values = map.trackers[token.id].values || []
       map.trackers[token.id].values.push(token.value)
     } else {
@@ -237,7 +237,7 @@ function stats(tokens: Array<Token>): DeepResults {
       let type = token.type == 'person' ? 'people' : token.type
       // Setup map for type
       map[type] = map[type] || {}
-      map[type][token.id] = map[type][token.id] || { ...token }
+      map[type][token.id] = map[type][token.id] || Object.assign(token, {})
       map[type][token.id].values = map[type][token.id].values || []
       map[type][token.id].values.push(1)
     }
@@ -262,10 +262,10 @@ function stats(tokens: Array<Token>): DeepResults {
     })
   })
 
-  return {
-    ...results,
-    ...{ words: tokens.length }
-  }
+  let response = results
+  response.words = tokens.length
+
+  return response
 }
 
 export const tokenizeDeep = deep
