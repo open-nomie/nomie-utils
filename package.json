@@ -7,7 +7,7 @@
   "jsnext:main": "build/index.es.js",
   "scripts": {
     "build": "rollup -c",
-    "lint": "standard src/*",
+    "lint": "standardx src/**/*.ts",
     "test-watch": "jest --coverage --watchAll",
     "test": "jest --coverage",
     "release": "npm run lint && npm run test && release-it"
@@ -19,15 +19,32 @@
     "preset": "ts-jest",
     "testEnvironment": "node"
   },
-  "standard": {
+  "eslintConfig": {
+    "rules": {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "error",
+      "space-before-function-paren": "off",
+      "spaced-comment": "off"
+    }
+  },
+  "standardx": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint/eslint-plugin"
+    ],
     "ignore": [
       "node_modules/",
-      "build/"
+      "build/",
+      "src/**/*.spec.*"
     ]
   },
   "author": "Brandon Corbin",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
+    "jest": "^25.5.1",
     "release-it": "^13.5.7",
     "rollup": "^2.7.3",
     "rollup-plugin-commonjs": "^10.1.0",
@@ -35,10 +52,9 @@
     "rollup-plugin-peer-deps-external": "^2.2.2",
     "rollup-plugin-typescript2": "^0.27.0",
     "standard": "^14.3.3",
-    "typescript": "^3.8.3",
-    "@types/jest": "^25.2.1",
-    "jest": "^25.5.1",
-    "ts-jest": "^25.4.0"
+    "standardx": "^5.0.0",
+    "ts-jest": "^25.4.0",
+    "typescript": "^3.8.3"
   },
   "dependencies": {}
 }

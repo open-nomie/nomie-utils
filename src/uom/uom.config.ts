@@ -113,10 +113,10 @@ export default {
     symbolAffix: 'post',
     symbolSpace: false,
     display: function (v: any) {
-      var sec_num = parseInt(v, 10) // don't forget the second param
-      var hours = Math.floor(sec_num / 3600)
-      var minutes = Math.floor((sec_num - hours * 3600) / 60)
-      var seconds = sec_num - hours * 3600 - minutes * 60
+      var secNum = parseInt(v, 10) // don't forget the second param
+      var hours = Math.floor(secNum / 3600)
+      var minutes = Math.floor((secNum - hours * 3600) / 60)
+      var seconds = secNum - hours * 3600 - minutes * 60
       return !hours
         ? minutes + 'm ' + seconds + 's'
         : hours + 'h ' + minutes + 'm'

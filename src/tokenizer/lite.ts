@@ -8,7 +8,7 @@ import { Token, WordPart } from './_interfaces'
  */
 function getValueString(word: string): number {
   const wordSplit = word.split('(')
-  let value = wordSplit.length == 2 ? wordSplit[1].replace(')', '') : '1'
+  let value = wordSplit.length === 2 ? wordSplit[1].replace(')', '') : '1'
   value = value.length ? value : '1'
   return parseStringValue(value)
 }
@@ -19,7 +19,7 @@ function getValueString(word: string): number {
  * @param valueStr String
  */
 function parseStringValue(valueStr: string): number {
-  if (valueStr.split('.').length == 2) {
+  if (valueStr.split('.').length === 2) {
     return parseFloat(valueStr)
   } else if (valueStr.search(':') > -1) {
     return time.timestringToSeconds(valueStr)
@@ -34,7 +34,7 @@ function parseStringValue(valueStr: string): number {
  * @param {String} word
  */
 function scrub(word: string): WordPart {
-  const cleanedWord: string = word.replace(/(\'|\,|\.|\!|’|\?|:)/gi, '')
+  const cleanedWord: string = word.replace(/('|,|\.|!|’|\?|:)/gi, '')
   return {
     word: cleanedWord,
     remainder: word.replace(cleanedWord, '')
@@ -82,12 +82,12 @@ function toToken(
  */
 function parse(str: string = ''): Array<Token> {
   // Split it into an array of lines
-  let lines = str.split(/\r?\n/)
-  let final: Array<Token> = []
+  const lines = str.split(/\r?\n/)
+  const final: Array<Token> = []
   // Loop over each line
   lines.forEach((line) => {
     // Extract
-    let tokens = parseStr(line)
+    const tokens = parseStr(line)
     tokens.forEach((token: Token) => {
       final.push(token)
     })
@@ -105,15 +105,15 @@ function parse(str: string = ''): Array<Token> {
  * @param {String} str
  */
 function parseStr(str: string): any {
-  let wordArray = str.trim().split(' ')
+  const wordArray = str.trim().split(' ')
   return (
     // Split on the space
     wordArray
       .map((word: string) => {
         // Loop over each word
-        let scrubbed = scrub(word) // Scrub it clean
-        let valueStr = getValueString(word)
-        let firstChar = word.trim().substr(0, 1)
+        const scrubbed = scrub(word) // Scrub it clean
+        const valueStr = getValueString(word)
+        const firstChar = word.trim().substr(0, 1)
         // switch on first character
         if (firstChar === '#') {
           if (word.match(/\d\d:\d\d/)) {

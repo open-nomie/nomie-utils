@@ -6,7 +6,7 @@ function main() {
    */
   function toArray(): Array<any> {
     return Object.keys(UOMS).map((key) => {
-      let obj = UOMS[key]
+      const obj = UOMS[key]
       obj.key = key
       return obj
     })
@@ -17,9 +17,9 @@ function main() {
    * { general: [], volume: []...}
    */
   function toGroupedArray(): any {
-    let items = {}
+    const items = {}
     Object.keys(UOMS).forEach((key) => {
-      let obj = UOMS[key]
+      const obj = UOMS[key]
       obj.key = key
       items[obj.type] = items[obj.type] || []
       items[obj.type].push(obj)
@@ -38,12 +38,12 @@ function main() {
     key: string,
     includeUnit: boolean = true
   ): string {
-    if (UOMS.hasOwnProperty(key) && !isNaN(value)) {
-      let symbol = UOMS[key].symbol
-      let affix = UOMS[key].symbolAffix
-      let space = UOMS[key].symbolSpace || false ? ' ' : ''
+    if (Object.prototype.hasOwnProperty.call(UOMS, key) && !isNaN(value)) {
+      const symbol = UOMS[key].symbol
+      const affix = UOMS[key].symbolAffix
+      const space = UOMS[key].symbolSpace || false ? ' ' : ''
       // Get display formatter for key if one exists.
-      let displayFormatter = UOMS[key].display || null
+      const displayFormatter = UOMS[key].display || null
       // Does the UOM have it's own display formatter?
       if (displayFormatter) {
         return displayFormatter(value) // displayFormatter(v);
@@ -52,7 +52,7 @@ function main() {
           value = addCommas(value)
         }
         if (affix && symbol && includeUnit) {
-          if (affix == 'pre') {
+          if (affix === 'pre') {
             return symbol + space + value
           } else {
             return value + space + symbol
@@ -71,7 +71,9 @@ function main() {
    * @param key string
    */
   function plural(key: string): string {
-    return UOMS.hasOwnProperty(key) ? UOMS[key].plural : key
+    return Object.prototype.hasOwnProperty.call(UOMS, key)
+      ? UOMS[key].plural
+      : key
   }
 
   /**
@@ -79,7 +81,9 @@ function main() {
    * @param key string
    */
   function singular(key: string): string {
-    return UOMS.hasOwnProperty(key) ? UOMS[key].singular : key
+    return Object.prototype.hasOwnProperty.call(UOMS, key)
+      ? UOMS[key].singular
+      : key
   }
 
   /**
@@ -87,7 +91,9 @@ function main() {
    * @param key string
    */
   function abv(key: string): any {
-    return UOMS.hasOwnProperty(key) ? UOMS[key].symbol : null
+    return Object.prototype.hasOwnProperty.call(UOMS, key)
+      ? UOMS[key].symbol
+      : null
   }
 
   /**
@@ -95,11 +101,11 @@ function main() {
    * @param base number
    */
   function addCommas(base: number = 0): string {
-    let num: string = `${base}`
-    let x = num.split('.')
+    const num: string = `${base}`
+    const x = num.split('.')
     let x1 = x[0]
-    let x2 = x.length > 1 ? '.' + x[1] : ''
-    let rgx = /(\d+)(\d{3})/
+    const x2 = x.length > 1 ? '.' + x[1] : ''
+    const rgx = /(\d+)(\d{3})/
     while (rgx.test(x1)) {
       x1 = x1.replace(rgx, '$1' + ',' + '$2')
     }

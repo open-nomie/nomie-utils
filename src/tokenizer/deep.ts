@@ -13,7 +13,7 @@ const remap = {
  * @param tokens Array
  */
 function stats(tokens: Array<Token>): DeepResults {
-  let map: any = {
+  const map: any = {
     trackers: {},
     people: {},
     context: {},
@@ -21,7 +21,9 @@ function stats(tokens: Array<Token>): DeepResults {
   }
   // Loop over tokens
   tokens.forEach((token: Token) => {
-    let type = remap.hasOwnProperty(token.type) ? remap[token.type] : token.type
+    const type = Object.prototype.hasOwnProperty.call(remap, token.type)
+      ? remap[token.type]
+      : token.type
     // set type if doesnt exist
     map[type] = map[type] || {}
     // Setup id in type, if not exist step to first token
@@ -33,7 +35,7 @@ function stats(tokens: Array<Token>): DeepResults {
   })
 
   // Create a Map for Results
-  let results: any = {
+  const results: any = {
     trackers: [],
     context: [],
     people: [],
@@ -42,17 +44,17 @@ function stats(tokens: Array<Token>): DeepResults {
 
   // Loop over the map to do final filtering
   Object.keys(map).forEach((type) => {
-    let items = map[type]
+    const items = map[type]
     // Loop over items for this type
     results[type] = Object.keys(items).map((id) => {
-      let token = items[id]
+      const token = items[id]
       token.sum = sum(token.values)
       token.avg = average(token.values)
       return token
     })
   })
 
-  let response = results
+  const response = results
   response.words = tokens.length
 
   return response
@@ -64,14 +66,16 @@ function stats(tokens: Array<Token>): DeepResults {
  * @param nums Array
  */
 function deep(str: string): DeepResults {
-  let tokens: Array<Token> = tokenizer(str)
-  let response = stats(tokens)
+  const tokens: Array<Token> = tokenizer(str)
+  const response = stats(tokens)
   response.tokens = tokens
   // Return selectors
   response.get = (type: string, id: string) => {
-    type = remap.hasOwnProperty(type) ? remap[type] : type
-    return response.hasOwnProperty(type)
-      ? response[type].find((t: Token) => t.id == id)
+    type = Object.prototype.hasOwnProperty.call(remap, type)
+      ? remap[type]
+      : type
+    return Object.prototype.hasOwnProperty.call(response, type)
+      ? response[type].find((t: Token) => t.id === id)
       : null
   }
   return response

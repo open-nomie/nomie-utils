@@ -4,8 +4,8 @@ export default {
   },
   // Seconds to Time Chunk "03:30:30"
   secondsToTime(secondsStr: string | number): string {
-    let _seconds =
-      typeof secondsStr == 'string' ? parseInt(secondsStr) : secondsStr
+    const _seconds =
+      typeof secondsStr === 'string' ? parseInt(secondsStr) : secondsStr
     let seconds = ''
     let minutes = Math.floor(_seconds / 60).toString()
     let hours = ''
@@ -28,7 +28,7 @@ export default {
     return ms / 1000
   },
   timestringToSeconds(timestring: string): number {
-    let tsa = timestring.split(':')
+    const tsa = timestring.split(':')
     return this.unitsToSeconds(tsa[0], tsa[1], tsa[2])
   },
   unitsToSeconds(hour: string, minutes: string, seconds: string): number {
@@ -37,5 +37,5 @@ export default {
     s = s + (parseInt(minutes) || 0) * 60
     s = s + (parseInt(seconds) || 0)
     return s
-  },
+  }
 }
