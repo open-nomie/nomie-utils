@@ -53,7 +53,6 @@ function main() {
         }
         if (affix && symbol && includeUnit) {
           if (affix == 'pre') {
-            console.log('Affix it!')
             return symbol + space + value
           } else {
             return value + space + symbol

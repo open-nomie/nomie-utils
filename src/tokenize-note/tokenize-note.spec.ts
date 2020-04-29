@@ -41,7 +41,6 @@ test('should tokenize deep a note', () => {
 
 test('stats should sum and average multiple of the same tag', () => {
   let results = tokenizeDeep(note)
-  // console.log("results", results);
   let noteTracker = results.trackers.find((el) => el.id == 'notes')
   expect(noteTracker.sum).toBe(11.1)
   expect(noteTracker.avg).toBe(5.55)
