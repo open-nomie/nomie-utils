@@ -113,6 +113,7 @@ function toToken(type, word, value, remainder, raw) {
  * @param {String} str
  */
 function parse(str) {
+    if (str === void 0) { str = ''; }
     // Split it into an array of lines
     var lines = str.split(/\r?\n/);
     var final = [];
@@ -130,34 +131,6 @@ function parse(str) {
     });
     // Return parsed note
     return final;
-}
-/**
- * Sum all numbers in an array
- * @param nums Array
- */
-function sum(nums) {
-    return nums.reduce(function (a, b) {
-        return a + b;
-    }, 0);
-}
-/**
- * Average all numbers in an array
- * @param nums Array
- */
-function average(nums) {
-    var total = nums.reduce(function (acc, c) { return acc + c; }, 0);
-    return total / nums.length;
-}
-/**
- * Deep Tokenization
- * Parse, and calculate base stats
- * @param nums Array
- */
-function deep(str) {
-    var tokens = parse(str);
-    var response = stats(tokens);
-    response.tokens = tokens;
-    return response;
 }
 /**
  * Parse a Line to an array.
@@ -205,6 +178,12 @@ function parseStr(str) {
     })
         .filter(function (word) { return word; }));
 } // end parse string
+
+var remap = {
+    tracker: 'trackers',
+    person: 'people',
+    link: 'links'
+};
 /**
  * Stats
  * Generate stats for a set of tokens
@@ -214,32 +193,27 @@ function stats(tokens) {
     var map = {
         trackers: {},
         people: {},
-        context: {}
+        context: {},
+        links: {}
     };
     // Loop over tokens
     tokens.forEach(function (token) {
-        // If its a tracker - do tracker things
-        if (token.type == 'tracker') {
-            map.trackers[token.id] =
-                map.trackers[token.id] || Object.assign(token, {});
-            map.trackers[token.id].values = map.trackers[token.id].values || [];
-            map.trackers[token.id].values.push(token.value);
-        }
-        else {
-            // Map person to people if needed
-            var type = token.type == 'person' ? 'people' : token.type;
-            // Setup map for type
-            map[type] = map[type] || {};
-            map[type][token.id] = map[type][token.id] || Object.assign(token, {});
-            map[type][token.id].values = map[type][token.id].values || [];
-            map[type][token.id].values.push(1);
-        }
+        var type = remap.hasOwnProperty(token.type) ? remap[token.type] : token.type;
+        // set type if doesnt exist
+        map[type] = map[type] || {};
+        // Setup id in type, if not exist step to first token
+        map[type][token.id] = map[type][token.id] || Object.assign(token, {});
+        // Setup a holder vor the values
+        map[type][token.id].values = map[type][token.id].values || [];
+        // Push the value, or default to 1
+        map[type][token.id].values.push(token.value || 1);
     });
     // Create a Map for Results
     var results = {
         trackers: [],
         context: [],
-        people: []
+        people: [],
+        links: []
     };
     // Loop over the map to do final filtering
     Object.keys(map).forEach(function (type) {
@@ -256,11 +230,41 @@ function stats(tokens) {
     response.words = tokens.length;
     return response;
 }
-var tokenizeDeep = deep;
-var tokenize = function (str) {
-    if (str === void 0) { str = ''; }
-    return parse(str);
-};
+/**
+ * Deep Tokenization
+ * Parse, and calculate base stats
+ * @param nums Array
+ */
+function deep(str) {
+    var tokens = parse(str);
+    var response = stats(tokens);
+    response.tokens = tokens;
+    // Return selectors
+    response.get = function (type, id) {
+        type = remap.hasOwnProperty(type) ? remap[type] : type;
+        return response.hasOwnProperty(type)
+            ? response[type].find(function (t) { return t.id == id; })
+            : null;
+    };
+    return response;
+}
+/**
+ * Sum all numbers in an array
+ * @param nums Array
+ */
+function sum(nums) {
+    return nums.reduce(function (a, b) {
+        return a + b;
+    }, 0);
+}
+/**
+ * Average all numbers in an array
+ * @param nums Array
+ */
+function average(nums) {
+    var total = nums.reduce(function (acc, c) { return acc + c; }, 0);
+    return total / nums.length;
+}
 
 var UOMS = {
     num: {
@@ -742,7 +746,7 @@ function main() {
 }
 var uom = main();
 
-exports.tokenize = tokenize;
-exports.tokenizeDeep = tokenizeDeep;
+exports.tokenize = parse;
+exports.tokenizeDeep = deep;
 exports.uom = uom;
 //# sourceMappingURL=index.js.map
