@@ -18,10 +18,20 @@ npm install nomie-utils
 
 Nomie stores all data for record as a single note. For example `Today I #walked(4) with @mom and @data #mood(6.7) +family` and then parses that note into structured data.
 
+#### A Token Object
+
+- **id**: an ID safe version of the word
+- **value**: The value provided. E.g. the 6 in #walked(6)
+- **raw**: the original word
+- **type**: the type (tracker|context|person|link|line-break|generic)
+- **prefix**: trigger character (#|+|@)
+- **remainder**: Any trailing special characters. For example the "," in "@brandon,"
+
 ### Tokenizer
 
 ```
-import { tokenize } from "nomie-utils";
+const tokenize = require("nomie-utils/tokenizer/lite");
+// import { tokenize } from "nomie-utils";
 
 const note = "I'm @brandon, this is a #tracker(20) +testing";
 const tokens = tokenize(note);
@@ -42,44 +52,26 @@ console.log(tokens);
 ]
 ```
 
-#### A Token Object
-
-- **id**: an ID safe version of the word
-- **value**: The value provided. E.g. the 6 in #walked(6)
-- **raw**: the original word
-- **type**: the type (tracker|context|person|link|line-break|generic)
-- **prefix**: trigger character (#|+|@)
-  -- **remainder**: Any trailing special characters. For example the "," in "@brandon,"
-
 ### Tokenizer Deep (grouped with sums and average)
 
 If you'd like to automatically group trackers, people and context, and sum / avg their values, use the `tokenizerDeep` method. This will not only parse the results, but return deeper context on their totals and usage.
 
 ```
-import { tokenizeDeep } from "nomie-utils";
+const tokenizeDeep = require("nomie-utils/tokenizer/deep");
+// or import { tokenizeDeep } from "nomie-utils";
 
-const note = "Hi I'm @brandon! #jump(20) #jump(10) #walk +testing";
-const tokens = tokenizeDeep(note);
-console.log(tokens);
-```
+const note = "Hello, I'm @brandon my #mood(6) and also #mood(2), I #owe(10) to @becky and #owe(1.5) to @tom and #owe(2) to @frank";
+// Get Totals for trackable items
+let tokensGrouped = tokenizeDeep(note);
 
-Returns
+let brandon = tokensGrouped.get("person", "brandon");
+let mood = tokensGrouped.get("tracker", "mood");
+let owes = tokensGrouped.get("tracker", "owe");
 
-```
-{
-    tokens: [...Array of tokens],
-    trackers: [
-        { id: "jump", type:"tracker", sum: 30, avg: 15, ...token}
-        { id: "walk", type:"tracker", sum: 1, avg: 1, ...token}
-    ],
-    context: [
-        { id: "testing", type:"context", sum: 1, avg: 1, ...token}
-    ],
-    people: [
-        { id: "brandon", type:"person", sum: 1, avg: 1, ...token}
-    ],
-    links: []
-}
+console.log(`✅ From this note: ${note}`);
+console.log(`Brandon was included ${brandon.sum} times`);
+console.log(`his mood is ${mood.avg}`);
+console.log(`he owes ${tokensGrouped.people.length} people $${owes.sum} total`);
 ```
 
 ## Nomie UOM
