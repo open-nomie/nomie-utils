@@ -8,7 +8,7 @@ var time = {
     },
     // Seconds to Time Chunk "03:30:30"
     secondsToTime: function (secondsStr) {
-        var _seconds = typeof secondsStr == 'string' ? parseInt(secondsStr) : secondsStr;
+        var _seconds = typeof secondsStr === 'string' ? parseInt(secondsStr) : secondsStr;
         var seconds = '';
         var minutes = Math.floor(_seconds / 60).toString();
         var hours = '';
@@ -38,7 +38,7 @@ var time = {
         s = s + (parseInt(minutes) || 0) * 60;
         s = s + (parseInt(seconds) || 0);
         return s;
-    },
+    }
 };
 
 /**
@@ -48,7 +48,7 @@ var time = {
  */
 function getValueString(word) {
     var wordSplit = word.split('(');
-    var value = wordSplit.length == 2 ? wordSplit[1].replace(')', '') : '1';
+    var value = wordSplit.length === 2 ? wordSplit[1].replace(')', '') : '1';
     value = value.length ? value : '1';
     return parseStringValue(value);
 }
@@ -58,7 +58,7 @@ function getValueString(word) {
  * @param valueStr String
  */
 function parseStringValue(valueStr) {
-    if (valueStr.split('.').length == 2) {
+    if (valueStr.split('.').length === 2) {
         return parseFloat(valueStr);
     }
     else if (valueStr.search(':') > -1) {
@@ -74,7 +74,7 @@ function parseStringValue(valueStr) {
  * @param {String} word
  */
 function scrub(word) {
-    var cleanedWord = word.replace(/(\'|\,|\.|\!|’|\?|:)/gi, '');
+    var cleanedWord = word.replace(/('|,|\.|!|’|\?|:)/gi, '');
     return {
         word: cleanedWord,
         remainder: word.replace(cleanedWord, '')
@@ -198,7 +198,9 @@ function stats(tokens) {
     };
     // Loop over tokens
     tokens.forEach(function (token) {
-        var type = remap.hasOwnProperty(token.type) ? remap[token.type] : token.type;
+        var type = Object.prototype.hasOwnProperty.call(remap, token.type)
+            ? remap[token.type]
+            : token.type;
         // set type if doesnt exist
         map[type] = map[type] || {};
         // Setup id in type, if not exist step to first token
@@ -241,9 +243,11 @@ function deep(str) {
     response.tokens = tokens;
     // Return selectors
     response.get = function (type, id) {
-        type = remap.hasOwnProperty(type) ? remap[type] : type;
-        return response.hasOwnProperty(type)
-            ? response[type].find(function (t) { return t.id == id; })
+        type = Object.prototype.hasOwnProperty.call(remap, type)
+            ? remap[type]
+            : type;
+        return Object.prototype.hasOwnProperty.call(response, type)
+            ? response[type].find(function (t) { return t.id === id; })
             : null;
     };
     return response;
@@ -381,10 +385,10 @@ var UOMS = {
         symbolAffix: 'post',
         symbolSpace: false,
         display: function (v) {
-            var sec_num = parseInt(v, 10); // don't forget the second param
-            var hours = Math.floor(sec_num / 3600);
-            var minutes = Math.floor((sec_num - hours * 3600) / 60);
-            var seconds = sec_num - hours * 3600 - minutes * 60;
+            var secNum = parseInt(v, 10); // don't forget the second param
+            var hours = Math.floor(secNum / 3600);
+            var minutes = Math.floor((secNum - hours * 3600) / 60);
+            var seconds = secNum - hours * 3600 - minutes * 60;
             return !hours
                 ? minutes + 'm ' + seconds + 's'
                 : hours + 'h ' + minutes + 'm';
@@ -666,7 +670,7 @@ function main() {
      */
     function format(value, key, includeUnit) {
         if (includeUnit === void 0) { includeUnit = true; }
-        if (UOMS.hasOwnProperty(key) && !isNaN(value)) {
+        if (Object.prototype.hasOwnProperty.call(UOMS, key) && !isNaN(value)) {
             var symbol = UOMS[key].symbol;
             var affix = UOMS[key].symbolAffix;
             var space = UOMS[key].symbolSpace || false ? ' ' : '';
@@ -681,7 +685,7 @@ function main() {
                     value = addCommas(value);
                 }
                 if (affix && symbol && includeUnit) {
-                    if (affix == 'pre') {
+                    if (affix === 'pre') {
                         return symbol + space + value;
                     }
                     else {
@@ -702,21 +706,27 @@ function main() {
      * @param key string
      */
     function plural(key) {
-        return UOMS.hasOwnProperty(key) ? UOMS[key].plural : key;
+        return Object.prototype.hasOwnProperty.call(UOMS, key)
+            ? UOMS[key].plural
+            : key;
     }
     /**
      * Singular
      * @param key string
      */
     function singular(key) {
-        return UOMS.hasOwnProperty(key) ? UOMS[key].singular : key;
+        return Object.prototype.hasOwnProperty.call(UOMS, key)
+            ? UOMS[key].singular
+            : key;
     }
     /**
      * Abreviation
      * @param key string
      */
     function abv(key) {
-        return UOMS.hasOwnProperty(key) ? UOMS[key].symbol : null;
+        return Object.prototype.hasOwnProperty.call(UOMS, key)
+            ? UOMS[key].symbol
+            : null;
     }
     /**
      * Add Comma to a number

@@ -6,11 +6,11 @@
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
   "scripts": {
-    "build": "rollup -c",
+    "build": "npm run lint && npm run test && rollup -c",
     "lint": "standardx src/**/*.ts",
     "test-watch": "jest --coverage --watchAll",
     "test": "jest --coverage",
-    "release": "npm run lint && npm run test && release-it"
+    "release": "release-it"
   },
   "files": [
     "build"
