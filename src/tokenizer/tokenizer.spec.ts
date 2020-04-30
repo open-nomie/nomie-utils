@@ -51,17 +51,39 @@ test('should tokenize deep a note', () => {
   expect(results.people.length).toBe(3)
   expect(results.trackers.length).toBe(4)
   expect(results.get('tracker', 'sleep').sum).toBe(15000)
-
-  expect(tokenizeDeep('#walked(1.6mile)').get('tracker', 'walked').sum).toBe(
-    1.6
-  )
-  expect(tokenizeDeep('#💩(1.6mile)').get('tracker', '💩').sum).toBe(1.6)
-  expect(tokenizeDeep('+💩').get('context', '💩')).toBeTruthy()
-  expect(tokenizeDeep('@💩').get('person', '💩')).toBeTruthy()
-
   // Does not exist
   expect(results.get('tracker', 'turkey')).toBeFalsy()
   expect(results.get('turkey', 'turkey')).toBeFalsy()
+})
+
+test('it should support including text in the value like #walked(1mile)', () => {
+  expect(tokenize('#walked(1.6mile)')[0].value).toBe(1.6)
+})
+
+test('it should support funky endings', () => {
+  expect(tokenize('#walked(1.6mile).')[0].id).toBe('walked')
+  expect(tokenize('#walked(1.6mile),')[0].id).toBe('walked')
+  expect(tokenize('#walked!!')[0].id).toBe('walked')
+  expect(tokenize('#walked?')[0].id).toBe('walked')
+})
+
+test('it should handle funky characters', () => {
+  expect(tokenizeDeep('#💩(1.6mile)').get('tracker', '💩').sum).toBe(1.6)
+  expect(tokenizeDeep('+💩').get('context', '💩')).toBeTruthy()
+  expect(tokenizeDeep('@💩').get('person', '💩')).toBeTruthy()
+})
+
+test("it should handle adding 's after things", () => {
+  expect(tokenize(`@brandon's`)[0].id).toBe('brandon')
+  expect(tokenize(`#brandon's`)[0].id).toBe('brandon')
+  expect(tokenize(`+brandon's`)[0].id).toBe('brandon')
+})
+
+test('it should find the right type', () => {
+  expect(tokenize(`@brandon's`)[0].type).toBe('person')
+  expect(tokenize(`#brandon's`)[0].type).toBe('tracker')
+  expect(tokenize(`+brandon's`)[0].type).toBe('context')
+  expect(tokenize(`https://nomie.app`)[0].type).toBe('link')
 })
 
 test('stats should sum and average multiple of the same tag', () => {

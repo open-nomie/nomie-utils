@@ -11,7 +11,7 @@ An [Open Source Life Tracker / Mood Tracker / Data Journal](https://nomie.app/) 
 ## Install
 
 ```
-npm install nomie-utils
+npm install nomie-utils --save-dev
 ```
 
 ## Note Tokenizer
@@ -30,8 +30,8 @@ Nomie stores all data for record as a single note. For example `Today I #walked(
 ### Tokenizer
 
 ```
-const tokenize = require("nomie-utils/tokenizer/lite");
-// import { tokenize } from "nomie-utils";
+const tokenize = require("nomie-utils").tokenize;
+// or import { tokenize } from "nomie-utils"
 
 const note = "I'm @brandon, this is a #tracker(20) +testing";
 const tokens = tokenize(note);
@@ -57,8 +57,8 @@ console.log(tokens);
 If you'd like to automatically group trackers, people and context, and sum / avg their values, use the `tokenizerDeep` method. This will not only parse the results, but return deeper context on their totals and usage.
 
 ```
-const tokenizeDeep = require("nomie-utils/tokenizer/deep");
-// or import { tokenizeDeep } from "nomie-utils";
+const tokenizeDeep = require("nomie-utils").tokenizeDeep;
+// or import { tokenizeDeep } from "nomie-utils"
 
 const note = "Hello, I'm @brandon my #mood(6) and also #mood(2), I #owe(10) to @becky and #owe(1.5) to @tom and #owe(2) to @frank";
 // Get Totals for trackable items
@@ -72,6 +72,11 @@ console.log(`✅ From this note: ${note}`);
 console.log(`Brandon was included ${brandon.sum} times`);
 console.log(`his mood is ${mood.avg}`);
 console.log(`he owes ${tokensGrouped.people.length} people $${owes.sum} total`);
+
+tokensGrouped.people.forEach((person) => {
+  console.log("People", person.raw);
+});
+
 ```
 
 ## Nomie UOM

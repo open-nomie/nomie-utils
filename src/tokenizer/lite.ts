@@ -1,6 +1,8 @@
 import time from '../time/time'
 import { Token, WordPart } from './_interfaces'
 
+const prefixes = { context: '+', person: '@', tracker: '#' }
+
 /**
  * getValueString
  * Returns a value string from #tracker(value)
@@ -34,7 +36,7 @@ function parseStringValue(valueStr: string): number {
  * @param {String} word
  */
 function scrub(word: string): WordPart {
-  const cleanedWord: string = word.replace(/('|,|\.|!|’|\?|:)/gi, '')
+  const cleanedWord: string = word.replace(/(’s|'s|\'|,|\.|!|’|\?|:)/gi, '')
   return {
     word: cleanedWord,
     remainder: word.replace(cleanedWord, '')
@@ -49,7 +51,6 @@ function scrub(word: string): WordPart {
  * @param {String} value
  * @param {String} remainder
  */
-const prefixes = { context: '+', person: '@', tracker: '#' }
 
 function toToken(
   type: string,
