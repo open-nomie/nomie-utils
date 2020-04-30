@@ -37,6 +37,7 @@ var time = {
     }
 };
 
+var prefixes = { context: '+', person: '@', tracker: '#' };
 /**
  * getValueString
  * Returns a value string from #tracker(value)
@@ -70,7 +71,7 @@ function parseStringValue(valueStr) {
  * @param {String} word
  */
 function scrub(word) {
-    var cleanedWord = word.replace(/('|,|\.|!|’|\?|:)/gi, '');
+    var cleanedWord = word.replace(/(’s|'s|'|,|\.|!|’|\?|:)/gi, '');
     return {
         word: cleanedWord,
         remainder: word.replace(cleanedWord, '')
@@ -84,7 +85,6 @@ function scrub(word) {
  * @param {String} value
  * @param {String} remainder
  */
-var prefixes = { context: '+', person: '@', tracker: '#' };
 function toToken(type, word, value, remainder, raw) {
     if (value === void 0) { value = ''; }
     if (remainder === void 0) { remainder = ''; }

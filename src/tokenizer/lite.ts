@@ -36,7 +36,7 @@ function parseStringValue(valueStr: string): number {
  * @param {String} word
  */
 function scrub(word: string): WordPart {
-  const cleanedWord: string = word.replace(/(’s|'s|\'|,|\.|!|’|\?|:)/gi, '')
+  const cleanedWord: string = word.replace(/(’s|'s|'|,|\.|!|’|\?|:)/gi, '')
   return {
     word: cleanedWord,
     remainder: word.replace(cleanedWord, '')
