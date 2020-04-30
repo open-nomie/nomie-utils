@@ -14,11 +14,13 @@ An [Open Source Life Tracker / Mood Tracker / Data Journal](https://nomie.app/) 
 npm install nomie-utils --save-dev
 ```
 
-## Note Tokenizer
+# Note Tokenizer
 
-Nomie stores all data for record as a single note. For example `Today I #walked(4) with @mom and @data #mood(6.7) +family` and then parses that note into structured data.
+Nomie stores all data for a record - as single note. For example `Today I #walked(4) with @mom and @dad #mood(6.7) +family`.
 
-#### A Token Object
+The tokenizer will break apart a note into individual tokens for each word. These tokens can then extact any values if present.
+
+## Then Token Object
 
 - **id**: an ID safe version of the word
 - **value**: The value provided. E.g. the 6 in #walked(6)
@@ -27,7 +29,11 @@ Nomie stores all data for record as a single note. For example `Today I #walked(
 - **prefix**: trigger character (#|+|@)
 - **remainder**: Any trailing special characters. For example the "," in "@brandon,"
 
-### Tokenizer
+---
+
+## tokenize(str)
+
+Tokenizer will return an array of tokens for each word in the note provided.
 
 ```
 const tokenize = require("nomie-utils").tokenize;
@@ -38,7 +44,7 @@ const tokens = tokenize(note);
 console.log(tokens);
 ```
 
-#### Returns an array of tokens
+### Returns an array of tokens
 
 ```
 [
@@ -52,16 +58,58 @@ console.log(tokens);
 ]
 ```
 
-### Tokenizer Deep (grouped with sums and average)
+## tokenizeDeep(str)
 
-If you'd like to automatically group trackers, people and context, and sum / avg their values, use the `tokenizerDeep` method. This will not only parse the results, but return deeper context on their totals and usage.
+Tokenizer Deep tokenizes the list, but also groups, counts, sums and averages each of the tokens.
+
+### Conceptual Example
+
+```
+tokenizeDeep("hello @bob, #mood(43) +test")
+```
+
+```
+{
+  trackers: [
+    {
+      id: mood,
+      raw: '#mood(43)',
+      value: 43,
+      sum: 43,
+      avg: 43
+    }
+  ],
+  people: [
+    {
+      id: bob,
+      raw: '@bob',
+      value: 1,
+      sum: 1,
+      avg: 1
+    }
+  ],
+  context: [
+    {
+      id: test,
+      raw: '+test',
+      value: 1,
+      sum: 1,
+      avg: 1
+    }
+  ],
+  links: [],
+  tokens: [...array of tokens]
+}
+```
+
+#### Code Example
 
 ```
 const tokenizeDeep = require("nomie-utils").tokenizeDeep;
 // or import { tokenizeDeep } from "nomie-utils"
 
 const note = "Hello, I'm @brandon my #mood(6) and also #mood(2), I #owe(10) to @becky and #owe(1.5) to @tom and #owe(2) to @frank";
-// Get Totals for trackable items
+
 let tokensGrouped = tokenizeDeep(note);
 
 let brandon = tokensGrouped.get("person", "brandon");
@@ -79,4 +127,21 @@ tokensGrouped.people.forEach((person) => {
 
 ```
 
-## Nomie UOM
+# Nomie UOM (Unit of Measurement)
+
+In Nomie a tracker has an unit of measurement, even if it's the default of "count". For example, water might use Fluid Ounces. We use the UOM module to then display the values in the accepted format. Like 13 turning in to 14oz, or 100 turning in to \$100.00
+
+[See the full documentation](src/uom/README.md)
+
+## uom.format(value, uomKey)
+
+Return a formated string of the value based on the UOM format
+
+```
+const uom = require("nomie-utils").uom;
+// or import { uom } from "nomie-utils"
+
+console.log(uom.format(100,'dollars')) // $100.00
+console.log(uom.format(100, 'franc')) // Fr.100.00
+console.log(uom.format(100, 'fluid-ounce)) // 100oz
+```
