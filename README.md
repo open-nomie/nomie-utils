@@ -20,7 +20,7 @@ Nomie stores all data for a record - as single note. For example `Today I #walke
 
 The tokenizer will break apart a note into individual tokens for each word. These tokens can then extact any values if present.
 
-## Then Token Object
+## Token Object
 
 - **id**: an ID safe version of the word
 - **value**: The value provided. E.g. the 6 in #walked(6)
