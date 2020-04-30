@@ -131,8 +131,6 @@ tokensGrouped.people.forEach((person) => {
 
 In Nomie a tracker has an unit of measurement, even if it's the default of "count". For example, water might use Fluid Ounces. We use the UOM module to then display the values in the accepted format. Like 13 turning in to 14oz, or 100 turning in to \$100.00
 
-[See the full documentation](src/uom/README.md)
-
 ## uom.format(value, uomKey)
 
 Return a formated string of the value based on the UOM format
@@ -145,3 +143,29 @@ console.log(uom.format(100,'dollars')) // $100.00
 console.log(uom.format(100, 'franc')) // Fr.100.00
 console.log(uom.format(100, 'fluid-ounce)) // 100oz
 ```
+
+[See the UOM documentation](src/uom/README.md)
+
+---
+
+## Links
+
+- [Nomie Website - nomie.app](https://nomie.app)
+- [Nomie v5 Web App - v5.nomie.app](https://v5.nomie.app)
+- [Nomie Web App Source - github.com/open-nomie/nomie](https://github.com/open-nomie/nomie)
+- [Reddit Community - reddit.com/r/nomie](https://reddit.com/r/nomie)
+- [Twitter - twitter.com/nomieapp](https://twitter.com/nomieapp)
+
+---
+
+Trademark License
+Nomie and the Blue Elephant are registered Trademarks of Happy Data, LLC. Indianapolis, IN. For a commercial use of the brand or logomark please contact support@happydata.org
+
+MIT License
+Copyright 2019 Happy Data, LLC support@happydata.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
