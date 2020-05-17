@@ -147,7 +147,7 @@ function parseStr(str) {
         var valueStr = getValueString(word);
         var firstChar = word.trim().substr(0, 1);
         // switch on first character
-        if (firstChar === '#') {
+        if (firstChar === '#' && word.length > 1) {
             if (word.match(/\d\d:\d\d/)) {
                 // if it's a timer
                 return toToken('tracker', word, valueStr, scrubbed.remainder.replace(word, ''));
@@ -156,10 +156,10 @@ function parseStr(str) {
                 return toToken('tracker', scrubbed.word, valueStr, scrubbed.remainder.replace(word, ''));
             }
         }
-        else if (firstChar === '@') {
+        else if (firstChar === '@' && word.length > 1) {
             return toToken('person', scrubbed.word.toLowerCase(), valueStr, scrubbed.remainder);
         }
-        else if (firstChar === '+') {
+        else if (firstChar === '+' && word.length > 1) {
             return toToken('context', scrubbed.word, valueStr, scrubbed.remainder);
         }
         else if (word.search(/https:|http:/) > -1) {
