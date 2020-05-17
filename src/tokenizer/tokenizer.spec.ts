@@ -17,6 +17,12 @@ test('should parse a note', () => {
   expect(tokens.filter((t) => t.type == 'link').length).toBe(2)
 })
 
+test('should not find a single + as a context', () => {
+  let note = `This is a + note`
+  let results = tokenizeDeep(note)
+  expect(results.context.length).toBe(0)
+})
+
 test('should handle handle links', () => {
   let linkNote = `This is a note with linkes! 
     https://github.com and https://nomie.app what about http://twitter.com/brandoncorbin and thats it
