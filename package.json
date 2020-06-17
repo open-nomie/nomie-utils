@@ -42,6 +42,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^25.2.1",
+    "@types/math-expression-evaluator": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
     "@typescript-eslint/parser": "^2.30.0",
     "jest": "^25.5.1",
@@ -56,5 +57,7 @@
     "ts-jest": "^25.4.0",
     "typescript": "^3.8.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "math-expression-evaluator": "^1.2.22"
+  }
 }

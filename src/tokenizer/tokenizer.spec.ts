@@ -17,6 +17,19 @@ test('should parse a note', () => {
   expect(tokens.filter((t) => t.type == 'link').length).toBe(2)
 })
 
+test('should handle math values', () => {
+  let addition = tokenize('note #math(4+4)')
+  expect(addition[1].value).toBe(8)
+  let multiply = tokenize('note #math(4*4)')
+  expect(multiply[1].value).toBe(16)
+  let division = tokenize('note #math(16/4)')
+  expect(division[1].value).toBe(4)
+  let withText = tokenize('note #math(16/4+4hrs)')
+  expect(withText[1].value).toBe(8)
+  let broken = tokenize('note #math(16/4+4hrs+&)')
+  expect(broken[1].value).toBe(0)
+})
+
 test('should not find a single + as a context', () => {
   let note = `This is a + note`
   let results = tokenizeDeep(note)

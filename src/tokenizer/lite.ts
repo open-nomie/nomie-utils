@@ -1,5 +1,6 @@
 import time from '../time/time'
 import { Token, WordPart } from './_interfaces'
+import mathEval from 'math-expression-evaluator'
 
 const prefixes = { context: '+', person: '@', tracker: '#' }
 
@@ -21,7 +22,14 @@ function getValueString(word: string): number {
  * @param valueStr String
  */
 function parseStringValue(valueStr: string): number {
-  if (valueStr.split('.').length === 2) {
+  if (valueStr.match(/\+|-|\/|\*|Mod|\(|\)/)) {
+    valueStr = valueStr.replace(/[a-z]+/gi, '')
+    try {
+      return parseFloat(mathEval.eval(valueStr))
+    } catch (e) {
+      return 0
+    }
+  } else if (valueStr.split('.').length === 2) {
     return parseFloat(valueStr)
   } else if (valueStr.search(':') > -1) {
     return time.timestringToSeconds(valueStr)
