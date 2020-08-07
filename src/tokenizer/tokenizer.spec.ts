@@ -103,6 +103,9 @@ test('it should find the right type', () => {
   expect(tokenize(`#brandon's`)[0].type).toBe('tracker')
   expect(tokenize(`+brandon's`)[0].type).toBe('context')
   expect(tokenize(`https://nomie.app`)[0].type).toBe('link')
+  expect(tokenize(`http://nomie.app`)[0].type).toBe('link')
+  expect(tokenize(`draft5://open?mode=123466`)[0].type).toBe('link')
+  expect(tokenize(`://open?mode=123466`)[0].type).toBe('generic')
 })
 
 test('stats should sum and average multiple of the same tag', () => {
