@@ -6,7 +6,7 @@ import tokenizeDeep from './deep'
 let note = `Testing #notes #notes(10.1) 
     #sleep(04:00:00) #sleep(00:10:00) #note #notes_boat 
 @bob, @Bob! @mom @😡 
-  https://google.com https://nomie.app
+  https://google.com nomie://nomie.app
     +contexts +contextsy Sweet movie.`
 
 test('should parse a note', () => {
@@ -105,6 +105,7 @@ test('it should find the right type', () => {
   expect(tokenize(`https://nomie.app`)[0].type).toBe('link')
   expect(tokenize(`http://nomie.app`)[0].type).toBe('link')
   expect(tokenize(`draft5://open?mode=123466`)[0].type).toBe('link')
+  expect(tokenize(`nomie://sample?123466`)[0].type).toBe('link')
   expect(tokenize(`://open?mode=123466`)[0].type).toBe('generic')
 })
 

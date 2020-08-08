@@ -867,7 +867,7 @@ function parseStr(str) {
         else if (firstChar === '+' && word.length > 1) {
             return toToken('context', scrubbed.word, valueStr, scrubbed.remainder);
         }
-        else if (word.search(/https:|http:/) > -1) {
+        else if (word.search(/(\w){3}:\/\/(\w)/) > -1) {
             return toToken('link', word.trim().replace(/(https|http):\/\//gi, ''), null, null, word.trim());
         }
         else if (word) {
