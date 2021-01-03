@@ -5,15 +5,22 @@ import mathEval from 'math-expression-evaluator'
 const prefixes = { context: '+', person: '@', tracker: '#' }
 
 /**
- * getValueString
+ *
+ * Get Parsed Value from word
  * Returns a value string from #tracker(value)
+ *
  * @param {String} word
  */
-function getValueString(word: string): number {
+function getParsedValue(word: string): ParsedStringValue {
   const wordSplit = word.split('(')
   let value = wordSplit.length === 2 ? wordSplit[1].replace(')', '') : '1'
   value = value.length ? value : '1'
   return parseStringValue(value)
+}
+
+interface ParsedStringValue {
+  value: number
+  uom?: string
 }
 
 /**
@@ -21,29 +28,50 @@ function getValueString(word: string): number {
  * Convert a string into a value, or a time string 01:03:44 into seconds
  * @param valueStr String
  */
-function parseStringValue(valueStr: string): number {
+function parseStringValue(valueStr: string): ParsedStringValue {
+  const uomMatch = valueStr.match(/[a-z/%$]+/gi)
+  const uom = uomMatch ? uomMatch[0] : undefined
+
   if (valueStr.match(/\+|-|\/|\*|Mod|\(|\)/)) {
     valueStr = valueStr.replace(/[a-z]+/gi, '')
     try {
-      return parseFloat(mathEval.eval(valueStr))
+      return {
+        value: parseFloat(mathEval.eval(valueStr)),
+        uom
+      }
     } catch (e) {
-      return 0
+      return {
+        value: 0,
+        uom
+      }
     }
   } else if (valueStr.split('.').length === 2) {
-    return parseFloat(valueStr)
+    return {
+      value: parseFloat(valueStr),
+      uom
+    }
   } else if (valueStr.search(':') > -1) {
-    return time.timestringToSeconds(valueStr)
+    return {
+      value: time.timestringToSeconds(valueStr),
+      uom: 'timer'
+    }
   } else {
-    return parseInt(valueStr)
+    return {
+      value: parseInt(valueStr),
+      uom
+    }
   }
 }
 
 /**
+ *
  * Scrub
  * Removes common word ending characters
+ *
  * @param {String} word
  */
 function scrub(word: string): WordPart {
+  // let uom:string;
   const cleanedWord: string = word.replace(/(’s|'s|'|,|\.|!|’|\?|:)/gi, '')
   return {
     word: cleanedWord,
@@ -52,8 +80,10 @@ function scrub(word: string): WordPart {
 }
 
 /**
+ *
  * toToken
  * Creates a payload that can be turned into a
+ *
  * @param {String} type tracker,context,person,generic
  * @param {String} word
  * @param {String} value
@@ -65,7 +95,8 @@ function toToken(
   word: any,
   value: any = '',
   remainder: any = '',
-  raw?: string | any
+  raw?: string | any,
+  uom?: string
 ): Token {
   const prefix = prefixes[type] || ''
   const id = (word.search(/\(/) > -1
@@ -79,14 +110,17 @@ function toToken(
     prefix, // #,@,+
     type, // type of trackableElement
     value, // value of the tracker
-    remainder //any trailing words
+    remainder, //any trailing words
+    uom
   }
 }
 
 /**
+ *
  * Parse
  * parses a string and returns an array of
  * elements
+ *
  * @param {String} str
  */
 function parse(str: string = ''): Array<Token> {
@@ -110,8 +144,10 @@ function parse(str: string = ''): Array<Token> {
 }
 
 /**
+ *
  * Parse a Line to an array.
  * @param {String} str
+ *
  */
 function parseStr(str: string): any {
   const wordArray = str.trim().split(' ')
@@ -121,7 +157,8 @@ function parseStr(str: string): any {
       .map((word: string) => {
         // Loop over each word
         const scrubbed = scrub(word) // Scrub it clean
-        const valueStr = getValueString(word)
+        const parsedValueString = getParsedValue(word)
+
         const firstChar = word.trim().substr(0, 1)
         // switch on first character
         if (firstChar === '#' && word.length > 1) {
@@ -130,26 +167,48 @@ function parseStr(str: string): any {
             return toToken(
               'tracker',
               word,
-              valueStr,
-              scrubbed.remainder.replace(word, '')
+              parsedValueString.value,
+              scrubbed.remainder.replace(word, ''),
+              null,
+              parsedValueString.uom
             )
           } else {
             return toToken(
               'tracker',
               scrubbed.word,
-              valueStr,
-              scrubbed.remainder.replace(word, '')
+              parsedValueString.value,
+              scrubbed.remainder.replace(word, ''),
+              null,
+              parsedValueString.uom
             )
           }
         } else if (firstChar === '@' && word.length > 1) {
           return toToken(
             'person',
             scrubbed.word.toLowerCase(),
-            valueStr,
-            scrubbed.remainder
+            parsedValueString.value,
+            scrubbed.remainder,
+            null,
+            parsedValueString.uom
           )
         } else if (firstChar === '+' && word.length > 1) {
-          return toToken('context', scrubbed.word, valueStr, scrubbed.remainder)
+          return toToken(
+            'context',
+            scrubbed.word,
+            parsedValueString.value,
+            scrubbed.remainder,
+            null,
+            parsedValueString.uom
+          )
+        } else if (firstChar === '/' && word.length > 1) {
+          return toToken(
+            'place',
+            scrubbed.word,
+            parsedValueString.value,
+            scrubbed.remainder,
+            null,
+            parsedValueString.uom
+          )
         } else if (word.search(/(\w){3}:\/\/(\w)/) > -1) {
           return toToken(
             'link',

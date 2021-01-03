@@ -3,8 +3,9 @@ export interface Token {
   raw: string // Raw word
   prefix: string // #,@,+
   type: string // type of trackableElement
-  value: string | number // value of the tracker
-  remainder: string //any trailing words
+  value?: string | number // value of the tracker
+  remainder?: string //any trailing words
+  uom?: string
 }
 
 export interface DeepResults {

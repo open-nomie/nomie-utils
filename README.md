@@ -16,18 +16,24 @@ npm install nomie-utils --save-dev
 
 # Note Tokenizer
 
-Nomie stores all data for a record - as single note. For example `Today I #walked(4) with @mom and @dad #mood(6.7) +family`.
+Nomie stores all data for a record - as single note. For example `Today I #walked(4miles) with @mom and @dad #mood(6.7) +family`.
 
 The tokenizer will break apart a note into individual tokens for each word. These tokens can then extact any values if present.
+
+- `#` represents a tracker - e.g. `#mood(6.6) #sleep(06:43:99)`
+- `@` represents a person - e.g. `@mom @dad`
+- `+` represents a context - e.g. `+travel(10days) +rehab(90days)`
+- `/` represents a place - e.g. `/home /mom_dads /showbizpizza`
 
 ## Token Object
 
 - **id**: an ID safe version of the word
-- **value**: The value provided. E.g. the 6 in #walked(6)
+- **value**: The value provided. E.g. the 6 in `#walked(6)`
 - **raw**: the original word
-- **type**: the type (tracker|context|person|link|line-break|generic)
-- **prefix**: trigger character (#|+|@)
+- **type**: the type `(tracker|context|person|place|link|line-break|generic)`
+- **prefix**: trigger character `(#|+|@)`
 - **remainder**: Any trailing special characters. For example the "," in "@brandon,"
+- **uom**: Unit of Measurement - the `lbs` in `#weight(123lbs)`
 
 ---
 
@@ -35,26 +41,71 @@ The tokenizer will break apart a note into individual tokens for each word. Thes
 
 Tokenizer will return an array of tokens for each word in the note provided.
 
-```
-const tokenize = require("nomie-utils").tokenize;
+```javascript
+const tokenize = require('nomie-utils').tokenize
 // or import { tokenize } from "nomie-utils"
 
-const note = "I'm @brandon, this is a #tracker(20) +testing";
-const tokens = tokenize(note);
-console.log(tokens);
+const note = "I'm @brandon, this is a #tracker(20) +testing"
+const tokens = tokenize(note)
+console.log(tokens)
 ```
 
 ### Returns an array of tokens
 
-```
+```json
 [
-    { id: 'I\'m',type: 'generic', raw: 'I\'m', prefix: null,  remainder: null },
-    { id: 'brandon', raw: '@brandon', prefix: '@', type: 'person',value: 1, remainder: ',' },
-    { id: 'this', type: 'generic', raw: 'this', prefix: null,  remainder: null },
-    { id: 'is',type: 'generic', raw: 'is', prefix: null,  remainder: null },
-    { id: 'a',type: 'generic', raw: 'a', prefix: null,  remainder: null },
-    { id: 'tracker', type: 'tracker', raw: '#tracker(20)', prefix: '#', value: 20, remainder: '' },
-    { id: 'testing', type: 'context', raw: '+testing', prefix: '+',value: 1, remainder: '' }
+  {
+    "id": "I'm",
+    "type": "generic",
+    "raw": "I'm",
+    "prefix": null,
+    "remainder": null
+  },
+  {
+    "id": "brandon",
+    "raw": "@brandon",
+    "prefix": "@",
+    "type": "person",
+    "value": 1,
+    "remainder": ","
+  },
+  {
+    "id": "this",
+    "type": "generic",
+    "raw": "this",
+    "prefix": null,
+    "remainder": null
+  },
+  {
+    "id": "is",
+    "type": "generic",
+    "raw": "is",
+    "prefix": null,
+    "remainder": null
+  },
+  {
+    "id": "a",
+    "type": "generic",
+    "raw": "a",
+    "prefix": null,
+    "remainder": null
+  },
+  {
+    "id": "tracker",
+    "type": "tracker",
+    "raw": "#tracker(20)",
+    "prefix": "#",
+    "value": 20,
+    "remainder": ""
+  },
+  {
+    "id": "testing",
+    "type": "context",
+    "raw": "+testing",
+    "prefix": "+",
+    "value": 1,
+    "remainder": ""
+  }
 ]
 ```
 
@@ -64,11 +115,11 @@ Tokenizer Deep tokenizes the list, but also groups, counts, sums and averages ea
 
 ### Conceptual Example
 
-```
-tokenizeDeep("hello @bob, #mood(43) +test")
+```javascript
+tokenizeDeep('hello @bob, #mood(43) +test')
 ```
 
-```
+```javascript
 {
   trackers: [
     {
@@ -104,30 +155,30 @@ tokenizeDeep("hello @bob, #mood(43) +test")
 
 #### Code Example
 
-```
-const tokenizeDeep = require("nomie-utils").tokenizeDeep;
+```javascript
+const tokenizeDeep = require('nomie-utils').tokenizeDeep
 // or import { tokenizeDeep } from "nomie-utils"
 
-const note = "Hello, I'm @brandon my #mood(6) and also #mood(2), I #owe(10) to @becky and #owe(1.5) to @tom and #owe(2) to @frank";
+const note =
+  "Hello, I'm @brandon my #mood(6) and also #mood(2), I #owe(10) to @becky and #owe(1.5) to @tom and #owe(2) to @frank"
 
-let tokensGrouped = tokenizeDeep(note);
+let tokensGrouped = tokenizeDeep(note)
 
-let brandon = tokensGrouped.get("person", "brandon");
-let mood = tokensGrouped.get("tracker", "mood");
-let owes = tokensGrouped.get("tracker", "owe");
+let brandon = tokensGrouped.get('person', 'brandon')
+let mood = tokensGrouped.get('tracker', 'mood')
+let owes = tokensGrouped.get('tracker', 'owe')
 
-console.log(`✅ From this note: ${note}`);
-console.log(`Brandon was included ${brandon.sum} times`);
-console.log(`his mood is ${mood.avg}`);
-console.log(`he owes ${tokensGrouped.people.length} people $${owes.sum} total`);
+console.log(`✅ From this note: ${note}`)
+console.log(`Brandon was included ${brandon.sum} times`)
+console.log(`his mood is ${mood.avg}`)
+console.log(`he owes ${tokensGrouped.people.length} people $${owes.sum} total`)
 
 tokensGrouped.people.forEach((person) => {
-  console.log("People", person.raw);
-});
-
+  console.log('People', person.raw)
+})
 ```
 
-# Nomie UOM (Unit of Measurement)
+## Nomie UOM (Unit of Measurement)
 
 In Nomie a tracker has an unit of measurement, even if it's the default of "count". For example, water might use Fluid Ounces. We use the UOM module to then display the values in the accepted format. Like 13 turning in to 14oz, or 100 turning in to \$100.00
 
@@ -135,7 +186,7 @@ In Nomie a tracker has an unit of measurement, even if it's the default of "coun
 
 Return a formated string of the value based on the UOM format
 
-```
+```javascript
 const uom = require("nomie-utils").uom;
 // or import { uom } from "nomie-utils"
 

@@ -4,10 +4,10 @@ import tokenize from './lite'
 import tokenizeDeep from './deep'
 
 let note = `Testing #notes #notes(10.1) 
-    #sleep(04:00:00) #sleep(00:10:00) #note #notes_boat 
-@bob, @Bob! @mom @😡 
+    #sleep(04:00:00) #sleep(00:10:00) #note #notes_boat /home
+@bob, @Bob! @mom @😡  
   https://google.com nomie://nomie.app
-    +contexts +contextsy Sweet movie.`
+    +contexts(90days) +contextsy Sweet movie.`
 
 test('should parse a note', () => {
   let tokens = tokenize(note)
@@ -15,6 +15,7 @@ test('should parse a note', () => {
   expect(tokens.filter((t) => t.type == 'tracker').length).toBe(6)
   expect(tokens.filter((t) => t.type == 'person').length).toBe(4)
   expect(tokens.filter((t) => t.type == 'link').length).toBe(2)
+  expect(tokens.filter((t) => t.type == 'place').length).toBe(1)
 })
 
 test('should handle math values', () => {
@@ -84,6 +85,17 @@ test('it should support funky endings', () => {
   expect(tokenize('#walked(1.6mile),')[0].id).toBe('walked')
   expect(tokenize('#walked!!')[0].id).toBe('walked')
   expect(tokenize('#walked?')[0].id).toBe('walked')
+  expect(tokenize('+travel(10days)')[0].value).toBe(10)
+})
+
+test('it should extract a UOM from a field', () => {
+  expect(tokenize('+travel(10days)')[0].uom).toBe('days')
+  expect(tokenize('+travel(10:30:32)')[0].uom).toBe('timer')
+  expect(tokenize('+travel(23mg)')[0].uom).toBe('mg')
+  expect(tokenize('+travel(24hours)')[0].uom).toBe('hours')
+  expect(tokenize('+travel(12mg/d)')[0].uom).toBe('mg/d')
+  expect(tokenize('+travel(12%)')[0].uom).toBe('%')
+  expect(tokenize('+travel(12%)')[0].value).toBe(12)
 })
 
 test('it should handle funky characters', () => {
