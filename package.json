@@ -10,7 +10,7 @@
     "lint": "standardx src/**/*.ts",
     "test-watch": "jest --coverage --watchAll",
     "test": "jest --coverage",
-    "release": "npm run build && release-it"
+    "release": "npm run test && release-it"
   },
   "files": [
     "build"
