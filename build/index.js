@@ -743,11 +743,13 @@ var formula_evaluator=postfix_evaluator;
 
 var prefixes = { context: '+', person: '@', tracker: '#' };
 /**
- * getValueString
+ *
+ * Get Parsed Value from word
  * Returns a value string from #tracker(value)
+ *
  * @param {String} word
  */
-function getValueString(word) {
+function getParsedValue(word) {
     var wordSplit = word.split('(');
     var value = wordSplit.length === 2 ? wordSplit[1].replace(')', '') : '1';
     value = value.length ? value : '1';
@@ -759,31 +761,51 @@ function getValueString(word) {
  * @param valueStr String
  */
 function parseStringValue(valueStr) {
+    var uomMatch = valueStr.match(/[a-z/%$]+/gi);
+    var uom = uomMatch ? uomMatch[0] : undefined;
     if (valueStr.match(/\+|-|\/|\*|Mod|\(|\)/)) {
         valueStr = valueStr.replace(/[a-z]+/gi, '');
         try {
-            return parseFloat(formula_evaluator.eval(valueStr));
+            return {
+                value: parseFloat(formula_evaluator.eval(valueStr)),
+                uom: uom
+            };
         }
         catch (e) {
-            return 0;
+            return {
+                value: 0,
+                uom: uom
+            };
         }
     }
     else if (valueStr.split('.').length === 2) {
-        return parseFloat(valueStr);
+        return {
+            value: parseFloat(valueStr),
+            uom: uom
+        };
     }
     else if (valueStr.search(':') > -1) {
-        return time.timestringToSeconds(valueStr);
+        return {
+            value: time.timestringToSeconds(valueStr),
+            uom: 'timer'
+        };
     }
     else {
-        return parseInt(valueStr);
+        return {
+            value: parseInt(valueStr),
+            uom: uom
+        };
     }
 }
 /**
+ *
  * Scrub
  * Removes common word ending characters
+ *
  * @param {String} word
  */
 function scrub(word) {
+    // let uom:string;
     var cleanedWord = word.replace(/(’s|'s|'|,|\.|!|’|\?|:)/gi, '');
     return {
         word: cleanedWord,
@@ -791,14 +813,16 @@ function scrub(word) {
     };
 }
 /**
+ *
  * toToken
  * Creates a payload that can be turned into a
+ *
  * @param {String} type tracker,context,person,generic
  * @param {String} word
  * @param {String} value
  * @param {String} remainder
  */
-function toToken(type, word, value, remainder, raw) {
+function toToken(type, word, value, remainder, raw, uom) {
     if (value === void 0) { value = ''; }
     if (remainder === void 0) { remainder = ''; }
     var prefix = prefixes[type] || '';
@@ -812,13 +836,16 @@ function toToken(type, word, value, remainder, raw) {
         prefix: prefix,
         type: type,
         value: value,
-        remainder: remainder //any trailing words
+        remainder: remainder,
+        uom: uom
     };
 }
 /**
+ *
  * Parse
  * parses a string and returns an array of
  * elements
+ *
  * @param {String} str
  */
 function parse(str) {
@@ -842,8 +869,10 @@ function parse(str) {
     return final;
 }
 /**
+ *
  * Parse a Line to an array.
  * @param {String} str
+ *
  */
 function parseStr(str) {
     var wordArray = str.trim().split(' ');
@@ -853,23 +882,26 @@ function parseStr(str) {
         .map(function (word) {
         // Loop over each word
         var scrubbed = scrub(word); // Scrub it clean
-        var valueStr = getValueString(word);
+        var parsedValueString = getParsedValue(word);
         var firstChar = word.trim().substr(0, 1);
         // switch on first character
         if (firstChar === '#' && word.length > 1) {
             if (word.match(/\d\d:\d\d/)) {
                 // if it's a timer
-                return toToken('tracker', word, valueStr, scrubbed.remainder.replace(word, ''));
+                return toToken('tracker', word, parsedValueString.value, scrubbed.remainder.replace(word, ''), null, parsedValueString.uom);
             }
             else {
-                return toToken('tracker', scrubbed.word, valueStr, scrubbed.remainder.replace(word, ''));
+                return toToken('tracker', scrubbed.word, parsedValueString.value, scrubbed.remainder.replace(word, ''), null, parsedValueString.uom);
             }
         }
         else if (firstChar === '@' && word.length > 1) {
-            return toToken('person', scrubbed.word.toLowerCase(), valueStr, scrubbed.remainder);
+            return toToken('person', scrubbed.word.toLowerCase(), parsedValueString.value, scrubbed.remainder, null, parsedValueString.uom);
         }
         else if (firstChar === '+' && word.length > 1) {
-            return toToken('context', scrubbed.word, valueStr, scrubbed.remainder);
+            return toToken('context', scrubbed.word, parsedValueString.value, scrubbed.remainder, null, parsedValueString.uom);
+        }
+        else if (firstChar === '/' && word.length > 1) {
+            return toToken('place', scrubbed.word, parsedValueString.value, scrubbed.remainder, null, parsedValueString.uom);
         }
         else if (word.search(/(\w){3}:\/\/(\w)/) > -1) {
             return toToken('link', word.trim().replace(/(https|http):\/\//gi, ''), null, null, word.trim());
