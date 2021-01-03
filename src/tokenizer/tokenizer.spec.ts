@@ -18,6 +18,10 @@ test('should parse a note', () => {
   expect(tokens.filter((t) => t.type == 'place').length).toBe(1)
 })
 
+test('should handle working with places', () => {
+  expect(tokenize('/culvers')[0].id).toBe('culvers')
+})
+
 test('should handle math values', () => {
   let addition = tokenize('note #math(4+4)')
   expect(addition[1].value).toBe(8)

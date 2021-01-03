@@ -2,7 +2,7 @@ import time from '../time/time'
 import { Token, WordPart } from './_interfaces'
 import mathEval from 'math-expression-evaluator'
 
-const prefixes = { context: '+', person: '@', tracker: '#' }
+const prefixes = { context: '+', person: '@', tracker: '#', place: '/' }
 
 /**
  *
